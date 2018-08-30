@@ -1,17 +1,23 @@
 #ifndef __MAIN_H
 #define __MAIN_H
-// SYSTEM
+/* SYSTEM */
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "string.h"
 // #include "usmart.h"
-// HARDWARE
+
+/* HARDWARE */
 #include "pwm.h"
-// RTOS
+#include "sdio_sdcard.h"
+
+/* RTOS */
 // #include "FreeRTOS.h"
 // #include "task.h"
 // #include "event_groups.h"
-// Third Party
+
+/* Third Party */
 // #include "arm_math.h"
+#include "ff.h"
 
 #endif
