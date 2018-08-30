@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "path": "./"
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "usart.h": "c",
+            "sys.h": "c",
+            "stm32f4xx.h": "c",
+            "pwm.h": "c",
+            "stm32f4xx_conf.h": "c",
+            "__locale": "c",
+            "__functional_03": "c",
+            "functional": "c",
+            "delay.h": "c"
+        }
+    }
+}

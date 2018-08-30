@@ -1,0 +1,6 @@
+OBJ/
+*.bat
+/Debug/
+Link/
+.vscode
+Makefile
