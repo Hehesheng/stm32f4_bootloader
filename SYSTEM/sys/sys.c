@@ -1,5 +1,10 @@
 #include "sys.h"
 
+static void beforeJumpToApp(void);
+static u32 STMFLASH_ReadWord(u32 faddr);
+static uint32_t STMFLASH_GetFlashSector(u32 addr);
+static FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t size);
+
 /**
   * @brief 从 Boot 跳转到 App
   *
@@ -25,9 +30,9 @@ void jumpToApp(void)
 }
 
 /**
-  * @brief 调用jump_To_Application之前要调用这个函数, 会重置中断, 时钟, 设置中断向量表
+  * @brief 调用jump_To_Application之前要调用这个函数, 会重置时钟
   */
-void beforeJumpToApp(void)
+static void beforeJumpToApp(void)
 {
     __disable_irq();
     //Reset All Enable
@@ -52,15 +57,14 @@ void beforeJumpToApp(void)
   *
   * @retval 是否写入成功
   */
-FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t size)
+static FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t size)
 {
-    u32 addrx = 0, endaddr = 0;
-    FLASH_Status status = FLASH_COMPLETE;
+    u32 addrx, endaddr;
     FLASH_Unlock();
     FLASH_DataCacheCmd(DISABLE);
     addrx = beginAddress;          //写入的起始地址
     endaddr = beginAddress + size; //写入的结束地址
-    if (addrx < 0X1FFF0000)        //只有主存储区,才需要执行擦除操作!!
+    if (addrx < 0X08FFFFFF)        //只有主存储区,才需要执行擦除操作!!
     {
         while (addrx < endaddr) //扫清一切障碍.(对非FFFFFFFF的地方,先擦除)
         {
@@ -73,24 +77,26 @@ FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t size)
                 addrx += 4;
         }
     }
-    if (status == FLASH_COMPLETE)
+    while (beginAddress < endaddr) //写数据
     {
-        while (beginAddress < endaddr) //写数据
-        {
-            if (FLASH_ProgramWord(beginAddress, *buff) != FLASH_COMPLETE) //写入数据
-            {
-                return FLASH_BUSY; //写入异常
-            }
-            beginAddress += 4;
-            buff ++;
-        }
+        if (FLASH_ProgramWord(beginAddress, *buff) != FLASH_COMPLETE) //写入数据
+            return FLASH_BUSY; //写入异常
+        beginAddress += 4;
+        buff++;
     }
     FLASH_DataCacheCmd(ENABLE);
     FLASH_Lock();
     return FLASH_COMPLETE;
 }
 
-uint16_t STMFLASH_GetFlashSector(u32 addr)
+/**
+  * @brief 获取当前地址所在扇区
+  *
+  * @param [IN]addr:地址
+  *
+  * @retval 扇区地址
+  */
+static uint32_t STMFLASH_GetFlashSector(u32 addr)
 {
     if (addr < ADDR_FLASH_SECTOR_1)
         return FLASH_Sector_0;
@@ -117,7 +123,44 @@ uint16_t STMFLASH_GetFlashSector(u32 addr)
     return FLASH_Sector_11;
 }
 
-inline u32 STMFLASH_ReadWord(u32 faddr)
+/**
+  * @brief 读取flash中数据
+  *
+  * @param [IN]faddr:flash中地址
+  *
+  * @retval flash地址内容
+  */
+static u32 STMFLASH_ReadWord(u32 faddr)
 {
     return *(vu32 *)faddr;
+}
+
+/**
+  * @brief 从SD卡更新数据
+  *
+  * @param [IN]path:文件目录
+  *
+  * @retval 是否写入成功
+  */
+FRESULT updataApplication(const TCHAR *path)
+{
+    FIL fsrc;
+    FRESULT fr;
+    UINT br;
+    BYTE buffer[2048]; //2k缓存
+    uint32_t address = ApplicationAddress;
+    fr = f_open(&fsrc, path, FA_READ);
+    if (fr)
+        return fr;
+    while (1)
+    {
+        fr = f_read(&fsrc, buffer, sizeof buffer, &br);
+        if (fr || br == 0)
+            break;
+        if (flashWrite(address, (uint32_t *)buffer, br) != FLASH_COMPLETE)
+            return FR_DISK_ERR;
+        USART_SendData(USART1, '.');
+        address += br;
+    }
+    return FR_OK;
 }

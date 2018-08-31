@@ -80,7 +80,7 @@ u8 findBin(const TCHAR *path, TCHAR *binName)
   *
   * @retval 获取是否成功
   */
-FRESULT getSDcardSpace(FATFS fs, const TCHAR *path, DWORD *tot, DWORD *fre)
+FRESULT getSDcardSpace(FATFS *fs, const TCHAR *path, DWORD *tot, DWORD *fre)
 {
     FRESULT res;
     DWORD fre_clust;
@@ -94,8 +94,8 @@ FRESULT getSDcardSpace(FATFS fs, const TCHAR *path, DWORD *tot, DWORD *fre)
     else
     {
         /* Get total sectors and free sectors */
-        *tot = ((fs.n_fatent - 2) * fs.csize) >> 1;
-        *fre = (fre_clust * fs.csize) >> 1;
+        *tot = ((fs->n_fatent - 2) * fs->csize) >> 1;
+        *fre = (fre_clust * fs->csize) >> 1;
         return res;
     }
 }

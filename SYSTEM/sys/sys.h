@@ -2,12 +2,14 @@
 #define __SYS_H
 #include "stm32f4xx.h"
 #include "stm32f4xx_flash.h"
+#include "ff.h"
 
 //0,不支持os
 //1,支持os
 #define SYSTEM_SUPPORT_OS 0 //定义系统文件夹是否支持OS
 
 //IAP Application Address
+#define BootloaderAddress  0x08000000
 #define ApplicationAddress 0x08010000
 
 //位带操作,实现51类似的GPIO控制功能
@@ -81,8 +83,6 @@
 
 //IAP Function
 void jumpToApp(void);
-void beforeJumpToApp(void);
-FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t size);
-uint16_t STMFLASH_GetFlashSector(u32 addr);
-inline u32 STMFLASH_ReadWord(u32 faddr);
+FRESULT updataApplication(const TCHAR *path);
+
 #endif

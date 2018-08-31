@@ -1,7 +1,5 @@
 #include "main.h"
 
-FRESULT updataApplication(const TCHAR *path);
-
 int main()
 {
     char binName[256];
@@ -22,7 +20,8 @@ int main()
             binName[1] = ':';
             printf("Find file: %s\r\n", binName);
             printf("Updata Begin!!!\r\n");
-            updataApplication(binName);
+            if (updataApplication(binName) != FR_OK)
+                printf("Updata Fail!!\r\n");
             printf("\n\rCompleted!\r\n");
         }
         else
@@ -34,26 +33,5 @@ int main()
 
     while (1)
         ;
-}
-
-FRESULT updataApplication(const TCHAR *path)
-{
-    FIL fsrc;
-    FRESULT fr;
-    UINT br;
-    BYTE buffer[2048]; //2k缓存
-    uint32_t address = ApplicationAddress;
-    fr = f_open(&fsrc, path, FA_READ);
-    if (fr) return fr;
-    while (1)
-    {
-        fr = f_read(&fsrc, buffer, sizeof buffer, &br);
-        if (fr || br == 0) break;
-        if (flashWrite(address, buffer, br) != FLASH_COMPLETE)
-            return FR_DISK_ERR;
-        USART_SendData(USART1, '.');
-        address += 2048;
-    }
-    return FR_OK;
 }
 
