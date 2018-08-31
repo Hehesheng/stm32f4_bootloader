@@ -30,12 +30,18 @@ void jumpToApp(void)
 void beforeJumpToApp(void)
 {
     __disable_irq();
-    RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM3, ENABLE);
-    RCC_APB2PeriphResetCmd(RCC_APB2Periph_USART1, ENABLE);
-    RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-    RCC_APB1PeriphResetCmd(RCC_APB1Periph_TIM3, DISABLE);
-    RCC_APB2PeriphResetCmd(RCC_APB2Periph_USART1, DISABLE);
-    RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_GPIOA, DISABLE);
+    //Reset All Enable
+    RCC->AHB1RSTR |= 0XFFFFFFFF;
+    RCC->AHB2RSTR |= 0XFFFFFFFF;
+    RCC->AHB3RSTR |= 0XFFFFFFFF;
+    RCC->APB1RSTR |= 0XFFFFFFFF;
+    RCC->APB2RSTR |= 0XFFFFFFFF;
+    //Reset All Disable
+    RCC->AHB1RSTR &= ~0XFFFFFFFF;
+    RCC->AHB2RSTR &= ~0XFFFFFFFF;
+    RCC->AHB3RSTR &= ~0XFFFFFFFF;
+    RCC->APB1RSTR &= ~0XFFFFFFFF;
+    RCC->APB2RSTR &= ~0XFFFFFFFF;
     NVIC_SetVectorTable(FLASH_BASE, ApplicationAddress^FLASH_BASE);
     __enable_irq();
 }
