@@ -1,12 +1,13 @@
 #include "main.h"
 
-FRESULT scan_files(char *path);
-
 int main()
 {
+    char binName[256];
+    u8 val;
     FATFS FatFs;
     FRESULT res;
-    DWORD fre_clust, fre_sect, tot_sect;
+    DWORD tot, fre;
+
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4); //设置中断
     delay_init(168);                                //delay初始化，系统主频168MHz
     uart_init(115200);                              //USART1波特率设置为115200
@@ -16,24 +17,14 @@ int main()
 
     f_mount(&FatFs, "0:", 1);
 
-    scan_files("0:");
-
     delay_ms(3000);
-
-    /* Get volume information and free clusters of drive 1 */
-    res = f_getfree("0:", &fre_clust, &FatFs);
-    if (res)
+    val = findBin("0:", binName);
+    if (val)
     {
-        printf("Get Free Fail\n");
+        printf("File Name: 0:/%s\n", binName);
     }
     else
-    {
-        /* Get total sectors and free sectors */
-        tot_sect = (FatFs.n_fatent - 2) * FatFs.csize;
-        fre_sect = fre_clust * FatFs.csize;
-        /* Print the free space (assuming 512 bytes/sector) */
-        printf("%10lu KiB total drive space.\n%10lu KiB available.\n", tot_sect / 2, fre_sect / 2);
-    }
+        printf("Not Found Bin File\n");
 
     f_unmount("0:");
 
