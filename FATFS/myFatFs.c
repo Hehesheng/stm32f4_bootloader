@@ -54,10 +54,11 @@ u8 findBin(const TCHAR *path, TCHAR *binName)
         {
             res = f_readdir(&dir, &fileinfo); //读取目录下的一个文件
             if (res != FR_OK || fileinfo.fname[0] == 0)
-                break;        //错误了/到末尾了,退出
+                break;                     //错误了/到末尾了,退出
             if (fileinfo.fattrib & AM_ARC) //如果读到这是一个文件
             {
-                if (!strcmp(fileinfo.fname + (strlen(fileinfo.fname) - 4), ".bin"))
+                if ((!strcmp(fileinfo.fname + (strlen(fileinfo.fname) - 4), ".bin") |
+                     !strcmp(fileinfo.fname + (strlen(fileinfo.fname) - 4), ".BIN")))
                 {
                     strcpy(binName, fileinfo.fname);
                     f_closedir(&dir);

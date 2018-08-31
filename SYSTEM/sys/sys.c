@@ -42,6 +42,82 @@ void beforeJumpToApp(void)
     RCC->AHB3RSTR &= ~0XFFFFFFFF;
     RCC->APB1RSTR &= ~0XFFFFFFFF;
     RCC->APB2RSTR &= ~0XFFFFFFFF;
-    NVIC_SetVectorTable(FLASH_BASE, ApplicationAddress^FLASH_BASE);
     __enable_irq();
+}
+
+/**
+  * @brief 往Flash中写入数据
+  *
+  * @param [IN]beginAddress:开始地址    [IN]buff:输入数据   [IN]size:数据大小
+  *
+  * @retval 是否写入成功
+  */
+FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t size)
+{
+    u32 addrx = 0, endaddr = 0;
+    FLASH_Status status = FLASH_COMPLETE;
+    FLASH_Unlock();
+    FLASH_DataCacheCmd(DISABLE);
+    addrx = beginAddress;          //写入的起始地址
+    endaddr = beginAddress + size; //写入的结束地址
+    if (addrx < 0X1FFF0000)        //只有主存储区,才需要执行擦除操作!!
+    {
+        while (addrx < endaddr) //扫清一切障碍.(对非FFFFFFFF的地方,先擦除)
+        {
+            if (STMFLASH_ReadWord(addrx) != 0XFFFFFFFF) //有非0XFFFFFFFF的地方,要擦除这个扇区
+            {
+                if (FLASH_EraseSector(STMFLASH_GetFlashSector(addrx), VoltageRange_3) != FLASH_COMPLETE)
+                    return FLASH_BUSY; //发生错误了
+            }
+            else
+                addrx += 4;
+        }
+    }
+    if (status == FLASH_COMPLETE)
+    {
+        while (beginAddress < endaddr) //写数据
+        {
+            if (FLASH_ProgramWord(beginAddress, *buff) != FLASH_COMPLETE) //写入数据
+            {
+                return FLASH_BUSY; //写入异常
+            }
+            beginAddress += 4;
+            buff ++;
+        }
+    }
+    FLASH_DataCacheCmd(ENABLE);
+    FLASH_Lock();
+    return FLASH_COMPLETE;
+}
+
+uint16_t STMFLASH_GetFlashSector(u32 addr)
+{
+    if (addr < ADDR_FLASH_SECTOR_1)
+        return FLASH_Sector_0;
+    else if (addr < ADDR_FLASH_SECTOR_2)
+        return FLASH_Sector_1;
+    else if (addr < ADDR_FLASH_SECTOR_3)
+        return FLASH_Sector_2;
+    else if (addr < ADDR_FLASH_SECTOR_4)
+        return FLASH_Sector_3;
+    else if (addr < ADDR_FLASH_SECTOR_5)
+        return FLASH_Sector_4;
+    else if (addr < ADDR_FLASH_SECTOR_6)
+        return FLASH_Sector_5;
+    else if (addr < ADDR_FLASH_SECTOR_7)
+        return FLASH_Sector_6;
+    else if (addr < ADDR_FLASH_SECTOR_8)
+        return FLASH_Sector_7;
+    else if (addr < ADDR_FLASH_SECTOR_9)
+        return FLASH_Sector_8;
+    else if (addr < ADDR_FLASH_SECTOR_10)
+        return FLASH_Sector_9;
+    else if (addr < ADDR_FLASH_SECTOR_11)
+        return FLASH_Sector_10;
+    return FLASH_Sector_11;
+}
+
+inline u32 STMFLASH_ReadWord(u32 faddr)
+{
+    return *(vu32 *)faddr;
 }

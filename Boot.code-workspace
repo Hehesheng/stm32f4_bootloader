@@ -15,7 +15,8 @@
             "__functional_03": "c",
             "functional": "c",
             "delay.h": "c",
-            "main.h": "c"
+            "main.h": "c",
+            "memory": "c"
         }
     }
 }
