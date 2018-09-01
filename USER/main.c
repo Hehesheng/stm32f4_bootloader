@@ -14,7 +14,7 @@ int main()
 
     if (f_mount(&FatFs, "0:", 1) == FR_OK)
     {
-        if (findBin("0:", binName+2))
+        if (findBin("0:", binName + 2))
         {
             binName[0] = '0';
             binName[1] = ':';
