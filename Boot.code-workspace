@@ -16,7 +16,10 @@
             "functional": "c",
             "delay.h": "c",
             "main.h": "c",
-            "memory": "c"
+            "memory": "c",
+            "myfatfs.h": "c",
+            "string.h": "c",
+            "ff.h": "c"
         }
     }
 }

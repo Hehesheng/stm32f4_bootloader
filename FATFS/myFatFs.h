@@ -4,7 +4,7 @@
 #include "usart.h"
 #include "string.h"
 
-FRESULT scan_files(const TCHAR *path);
+FRESULT scanFiles(const TCHAR *path);
 FRESULT getSDcardSpace(FATFS *fs, const TCHAR *path, DWORD *tot, DWORD *fre);
 u8 findBin(const TCHAR *path, TCHAR *binName);
 

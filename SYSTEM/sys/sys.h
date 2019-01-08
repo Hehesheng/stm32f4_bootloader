@@ -83,6 +83,7 @@
 
 //IAP Function
 void jumpToApp(void);
-FRESULT updataApplication(const TCHAR *path);
+void beforeAppBegin(void);
+FRESULT updateApplication(const TCHAR *path);
 
 #endif

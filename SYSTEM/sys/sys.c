@@ -80,7 +80,7 @@ static FLASH_Status flashWrite(uint32_t beginAddress, uint32_t *buff, uint32_t s
     while (beginAddress < endaddr) //写数据
     {
         if (FLASH_ProgramWord(beginAddress, *buff) != FLASH_COMPLETE) //写入数据
-            return FLASH_BUSY; //写入异常
+            return FLASH_BUSY;                                        //写入异常
         beginAddress += 4;
         buff++;
     }
@@ -142,7 +142,7 @@ static u32 STMFLASH_ReadWord(u32 faddr)
   *
   * @retval 是否写入成功
   */
-FRESULT updataApplication(const TCHAR *path)
+FRESULT updateApplication(const TCHAR *path)
 {
     FIL fsrc;
     FRESULT fr;
@@ -159,8 +159,16 @@ FRESULT updataApplication(const TCHAR *path)
             break;
         if (flashWrite(address, (uint32_t *)buffer, br) != FLASH_COMPLETE)
             return FR_DISK_ERR;
-        USART_SendData(USART1, '.');
+        USART_SendData(USART1, '#');
         address += br;
     }
     return FR_OK;
+}
+
+/**
+  * @brief IAP之后的APP初始化内容
+  */
+void beforeAppBegin(void)
+{
+    NVIC_SetVectorTable(NVIC_VectTab_FLASH, ApplicationAddress^BootloaderAddress); //设置中断向量表
 }

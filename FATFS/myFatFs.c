@@ -8,7 +8,7 @@
   *
   * @retval 获取是否成功
   */
-FRESULT scan_files(const TCHAR *path)
+FRESULT scanFiles(const TCHAR *path)
 {
     DIR dir;
     FRESULT res;

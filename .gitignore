@@ -1,6 +1,9 @@
 OBJ/
+.gitignore
 *.bat
 /Debug/
 Link/
 .vscode
-Makefile
+USER/*.HEHE
+USER/*.uvoptx
+USER/*.uvprojx

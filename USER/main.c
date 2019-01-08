@@ -10,7 +10,7 @@ int main()
     uart_init(115200);                              //USART1波特率设置为115200
 
     TIM3_PWM_Init(2000 - 1, 16800 - 1); // 84M/(8400*2000) = 5hz
-    TIM_SetCompare1(TIM3, 1000);        // 比较值CCR1为500
+    TIM_SetCompare1(TIM3, 1000);        // 比较值CCR1为1000
 
     if (f_mount(&FatFs, "0:", 1) == FR_OK)
     {
@@ -20,7 +20,7 @@ int main()
             binName[1] = ':';
             printf("Find file: %s\r\n", binName);
             printf("Updata Begin!!!\r\n");
-            if (updataApplication(binName) != FR_OK)
+            if (updateApplication(binName) != FR_OK)
                 printf("Updata Fail!!\r\n");
             printf("\n\rCompleted!\r\n");
         }
@@ -34,4 +34,3 @@ int main()
     while (1)
         ;
 }
-
