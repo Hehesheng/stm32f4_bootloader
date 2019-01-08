@@ -4,6 +4,5 @@ OBJ/
 /Debug/
 Link/
 .vscode
-USER/*.HEHE
-USER/*.uvoptx
-USER/*.uvprojx
+USER/*.uv*
+*.code-workspace
